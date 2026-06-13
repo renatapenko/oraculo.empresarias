@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Oráculo das Feridas da Empreendedora</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #1a1410;
+    --bg2: #221c16;
+    --bg3: #2a221a;
+    --gold: #c9923a;
+    --gold-light: #e0b06a;
+    --gold-dim: #a07030;
+    --text: #f0e6d4;
+    --text-dim: #b8a890;
+    --text-faint: #7a6a58;
+    --border: rgba(201,146,58,0.25);
+    --border-dim: rgba(240,230,212,0.12);
+  }
+
+  html { font-size: 16px; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .screen { display: none; }
+  .screen.active { display: flex; flex-direction: column; min-height: 100vh; }
+
+  /* ─── ABERTURA ─── */
+  #screen-open {
+    padding: 48px 24px 40px;
+    justify-content: space-between;
+    gap: 32px;
+  }
+
+  .eye {
+    width: 44px; height: 22px;
+    border: 1.5px solid var(--gold-dim);
+    border-radius: 50%;
+    position: relative;
+    margin-bottom: 40px;
+  }
+  .eye::after {
+    content: '';
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: var(--gold-dim);
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .open-eyebrow {
+    font-size: 10px;
+    letter-spacing: 3.5px;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin-bottom: 14px;
+  }
+
+  .open-heading {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(28px, 7vw, 38px);
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--text);
+    margin-bottom: 28px;
+  }
+
+  .open-body {
+    font-size: 15px;
+    line-height: 1.85;
+    color: var(--text-dim);
+  }
+  .open-body p { margin-bottom: 14px; }
+
+  .quote-block {
+    border-left: 2px solid var(--gold-dim);
+    padding: 4px 0 4px 20px;
+    margin: 28px 0;
+  }
+  .quote-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 17px;
+    color: var(--text);
+    line-height: 1.65;
+  }
+  .quote-attr {
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--gold-dim);
+    margin-top: 10px;
+    text-transform: uppercase;
+  }
+
+  .patterns {
+    margin: 20px 0 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .pattern-item {
+    font-size: 14px;
+    color: var(--text-dim);
+    padding-left: 18px;
+    position: relative;
+    line-height: 1.5;
+  }
+  .pattern-item::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--gold-dim);
+  }
+
+  .cta-btn {
+    display: block;
+    width: 100%;
+    background: transparent;
+    border: 1.5px solid var(--gold);
+    color: var(--gold-light);
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 18px 24px;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 8px;
+  }
+  .cta-btn:hover, .cta-btn:active {
+    background: rgba(201,146,58,0.12);
+    color: #f0c878;
+  }
+
+  /* ─── QUIZ ─── */
+  #screen-quiz {
+    padding: 32px 24px 40px;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .prog-label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-bottom: 10px;
+  }
+
+  .prog-track {
+    width: 100%;
+    height: 1.5px;
+    background: var(--border-dim);
+    margin-bottom: 36px;
+  }
+  .prog-fill {
+    height: 1.5px;
+    background: var(--gold);
+    transition: width 0.4s ease;
+  }
+
+  .q-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 12px;
+    letter-spacing: 3px;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  .q-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(22px, 5.5vw, 28px);
+    font-weight: 400;
+    color: var(--text);
+    line-height: 1.35;
+    margin-bottom: 32px;
+  }
+
+  .opts { display: flex; flex-direction: column; gap: 10px; }
+
+  .opt {
+    background: var(--bg2);
+    border: 1.5px solid var(--border-dim);
+    color: var(--text-dim);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 300;
+    padding: 16px 18px;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s;
+    line-height: 1.5;
+    border-radius: 2px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .opt:active { background: var(--bg3); }
+  .opt.selected {
+    border-color: var(--gold);
+    color: var(--text);
+    background: rgba(201,146,58,0.1);
+  }
+
+  .opt-letter {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 12px;
+    color: var(--gold-dim);
+    margin-right: 10px;
+  }
+
+  .nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 8px;
+  }
+
+  .btn-back {
+    background: transparent;
+    border: none;
+    color: var(--text-faint);
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    padding: 12px 0;
+    font-family: 'Inter', sans-serif;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn-back:disabled { opacity: 0.2; cursor: default; }
+
+  .btn-next {
+    background: transparent;
+    border: 1.5px solid var(--gold);
+    color: var(--gold-light);
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 14px 28px;
+    cursor: pointer;
+    transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn-next:disabled {
+    border-color: var(--border-dim);
+    color: var(--text-faint);
+    cursor: default;
+  }
+  .btn-next:not(:disabled):active {
+    background: rgba(201,146,58,0.1);
+  }
+
+  /* ─── RESULTADO ─── */
+  #screen-result {
+    padding: 48px 24px 56px;
+  }
+
+  .res-eyebrow {
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin-bottom: 8px;
+  }
+
+  .res-wound {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(36px, 10vw, 52px);
+    font-weight: 400;
+    color: var(--text);
+    letter-spacing: 1px;
+    line-height: 1.1;
+    margin-bottom: 6px;
+  }
+
+  .res-archetype {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin-bottom: 32px;
+  }
+
+  .res-divider {
+    width: 36px;
+    height: 1.5px;
+    background: var(--gold-dim);
+    margin-bottom: 28px;
+  }
+
+  .res-narrative {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(17px, 4.5vw, 20px);
+    font-style: italic;
+    color: var(--text);
+    line-height: 1.85;
+    margin-bottom: 36px;
+  }
+  .res-narrative p { margin-bottom: 12px; }
+
+  .belief-box {
+    background: var(--bg2);
+    border: 1.5px solid var(--border);
+    padding: 20px 22px;
+    margin-bottom: 36px;
+    border-radius: 2px;
+  }
+  .belief-label {
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-bottom: 12px;
+  }
+  .belief-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 19px;
+    font-style: italic;
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  .pillars-section { margin-bottom: 36px; }
+  .pillars-label {
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-bottom: 20px;
+  }
+
+  .pillar-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+  .pillar-name {
+    font-size: 11px;
+    color: var(--text-dim);
+    width: 96px;
+    flex-shrink: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .pillar-track {
+    flex: 1;
+    height: 1.5px;
+    background: var(--border-dim);
+  }
+  .pillar-fill {
+    height: 1.5px;
+    background: var(--gold);
+    transition: width 1.2s ease 0.2s;
+  }
+  .pillar-pct {
+    font-size: 12px;
+    color: var(--gold-dim);
+    width: 34px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .secondary-box {
+    background: var(--bg2);
+    border: 1px solid var(--border-dim);
+    padding: 18px 22px;
+    margin-bottom: 36px;
+    border-radius: 2px;
+  }
+  .secondary-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-bottom: 8px;
+  }
+  .secondary-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+  }
+  .secondary-belief {
+    font-size: 13px;
+    color: var(--text-faint);
+    line-height: 1.65;
+  }
+
+  .evolution-block { margin-bottom: 40px; }
+  .evolution-label {
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin-bottom: 12px;
+  }
+  .evolution-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 30px;
+    font-weight: 400;
+    color: var(--gold-light);
+    margin-bottom: 10px;
+    line-height: 1.2;
+  }
+  .evolution-desc {
+    font-size: 14px;
+    color: var(--text-dim);
+    line-height: 1.7;
+  }
+
+  .final-block {
+    border-top: 1px solid var(--border-dim);
+    padding-top: 32px;
+    margin-bottom: 40px;
+  }
+  .final-block p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    color: var(--text-dim);
+    line-height: 1.9;
+    margin-bottom: 6px;
+  }
+  .final-small {
+    margin-top: 18px;
+    font-size: 13px !important;
+    color: var(--text-faint) !important;
+    font-family: 'Inter', sans-serif !important;
+    font-style: normal !important;
+    line-height: 1.75 !important;
+  }
+
+  .restart-btn {
+    background: transparent;
+    border: 1px solid var(--border-dim);
+    color: var(--text-faint);
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 14px 24px;
+    cursor: pointer;
+    transition: all 0.3s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .restart-btn:active {
+    border-color: var(--text-dim);
+    color: var(--text-dim);
+  }
+
+  @media (min-width: 600px) {
+    #screen-open, #screen-quiz, #screen-result {
+      max-width: 560px;
+      margin: 0 auto;
+      padding-left: 40px;
+      padding-right: 40px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- ABERTURA -->
+<div id="screen-open" class="screen active">
+  <div>
+    <div class="eye"></div>
+    <div class="open-eyebrow">Oráculo das Feridas da Empreendedora</div>
+    <h1 class="open-heading">Você acredita que seu problema é estratégia.</h1>
+    <div class="open-body">
+      <p>Talvez pense que precisa de mais conhecimento. Mais seguidores. Mais posicionamento. Mais disciplina. Mais coragem.</p>
+      <p>Mas existe algo que quase nenhuma empreendedora percebe.</p>
+      <p>Você não toma decisões apenas como adulta. Você toma decisões a partir das histórias emocionais que aprendeu para sobreviver.</p>
+    </div>
+    <div class="quote-block">
+      <div class="quote-text">"Até que você torne o inconsciente consciente, ele dirigirá sua vida e você o chamará de destino."</div>
+      <div class="quote-attr">— Carl Jung</div>
+    </div>
+    <div class="open-body">
+      <p>Muitas mulheres passam anos tentando consertar o negócio. Quando na verdade estão repetindo padrões muito mais antigos do que ele.</p>
+    </div>
+    <div class="patterns">
+      <div class="pattern-item">Perfeccionismo</div>
+      <div class="pattern-item">Excesso de responsabilidade</div>
+      <div class="pattern-item">Necessidade de aprovação</div>
+      <div class="pattern-item">Dificuldade de cobrar</div>
+      <div class="pattern-item">Medo de aparecer</div>
+      <div class="pattern-item">Esgotamento constante</div>
+    </div>
+    <div class="open-body">
+      <p>Responda com honestidade.<br>Não quem você gostaria de ser.<br>Quem você é quando ninguém está olhando.</p>
+    </div>
+  </div>
+  <button class="cta-btn" onclick="startQuiz()">Começar minha jornada</button>
+</div>
+
+<!-- QUIZ -->
+<div id="screen-quiz" class="screen">
+  <div>
+    <div class="prog-label" id="prog-label">Pergunta 1 de 15</div>
+    <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+    <div class="q-num" id="q-num">01</div>
+    <div class="q-text" id="q-text"></div>
+    <div class="opts" id="opts"></div>
+  </div>
+  <div class="nav">
+    <button class="btn-back" id="btn-back" onclick="prevQ()" disabled>← Voltar</button>
+    <button class="btn-next" id="btn-next" onclick="nextQ()" disabled>Continuar →</button>
+  </div>
+</div>
+
+<!-- RESULTADO -->
+<div id="screen-result" class="screen">
+  <div id="result-content"></div>
+</div>
+
+<script>
+const Q = [
+  {t:"Quando alguém cresce mais rápido que você:",o:[{l:"A",t:"Preciso aprender mais.",w:"R"},{l:"B",t:"Talvez eu nunca chegue lá.",w:"A"},{l:"C",t:"Talvez eu não mereça isso.",w:"H"},{l:"D",t:"Quero entender exatamente o que ela fez.",w:"T"},{l:"E",t:"Preciso trabalhar mais.",w:"I"}]},
+  {t:"Quando recebe um elogio:",o:[{l:"A",t:"Tenho dificuldade de acreditar.",w:"R"},{l:"B",t:"Me sinto finalmente vista.",w:"A"},{l:"C",t:"Fico constrangida.",w:"H"},{l:"D",t:"Mudo rapidamente de assunto.",w:"T"},{l:"E",t:"Sinto que preciso continuar correspondendo.",w:"I"}]},
+  {t:"Qual crítica mais machuca?",o:[{l:"A",t:"Você não é tão boa.",w:"R"},{l:"B",t:"Não precisamos de você.",w:"A"},{l:"C",t:"Você é egoísta.",w:"H"},{l:"D",t:"Não podemos confiar em você.",w:"T"},{l:"E",t:"Você falhou.",w:"I"}]},
+  {t:"Quando pensa em aparecer mais:",o:[{l:"A",t:"Tenho medo de julgamento.",w:"R"},{l:"B",t:"Tenho medo de ser ignorada.",w:"A"},{l:"C",t:"Tenho vergonha.",w:"H"},{l:"D",t:"Tenho medo de perder o controle.",w:"T"},{l:"E",t:"Tenho medo de errar.",w:"I"}]},
+  {t:"Seu maior medo ao vender:",o:[{l:"A",t:"Ser rejeitada.",w:"R"},{l:"B",t:"Ser abandonada.",w:"A"},{l:"C",t:"Parecer interesseira.",w:"H"},{l:"D",t:"Ser enganada.",w:"T"},{l:"E",t:"Não entregar perfeitamente.",w:"I"}]},
+  {t:"Quando trava:",o:[{l:"A",t:"Estudo mais.",w:"R"},{l:"B",t:"Procuro validação.",w:"A"},{l:"C",t:"Ajudo outras pessoas.",w:"H"},{l:"D",t:"Tento controlar tudo.",w:"T"},{l:"E",t:"Reviso tudo infinitamente.",w:"I"}]},
+  {t:"O que mais drena sua energia?",o:[{l:"A",t:"Comparação.",w:"R"},{l:"B",t:"Necessidade de aprovação.",w:"A"},{l:"C",t:"Culpa.",w:"H"},{l:"D",t:"Controle.",w:"T"},{l:"E",t:"Autocobrança.",w:"I"}]},
+  {t:"Quando pensa em aumentar seus preços:",o:[{l:"A",t:"Ainda não sou boa o suficiente.",w:"R"},{l:"B",t:"As pessoas podem ir embora.",w:"A"},{l:"C",t:"Me sinto culpada.",w:"H"},{l:"D",t:"Preciso garantir tudo antes.",w:"T"},{l:"E",t:"Preciso melhorar mais.",w:"I"}]},
+  {t:"O que mais descreve sua vida:",o:[{l:"A",t:"Preparação infinita.",w:"R"},{l:"B",t:"Busca constante por segurança.",w:"A"},{l:"C",t:"Doação excessiva.",w:"H"},{l:"D",t:"Sobrecarga solitária.",w:"T"},{l:"E",t:"Exigência extrema.",w:"I"}]},
+  {t:"Qual frase mora dentro de você?",o:[{l:"A",t:"Ainda não estou pronta.",w:"R"},{l:"B",t:"Não me deixe.",w:"A"},{l:"C",t:"Não seja egoísta.",w:"H"},{l:"D",t:"Eu resolvo sozinha.",w:"T"},{l:"E",t:"Preciso fazer melhor.",w:"I"}]},
+  {t:"Quando recebe um não:",o:[{l:"A",t:"Questiono meu valor.",w:"R"},{l:"B",t:"Me sinto esquecida.",w:"A"},{l:"C",t:"Me sinto culpada.",w:"H"},{l:"D",t:"Fico desconfiada.",w:"T"},{l:"E",t:"Acho que falhei.",w:"I"}]},
+  {t:"O que você mais esconde?",o:[{l:"A",t:"Minha insegurança.",w:"R"},{l:"B",t:"Minha carência.",w:"A"},{l:"C",t:"Meus desejos.",w:"H"},{l:"D",t:"Minha vulnerabilidade.",w:"T"},{l:"E",t:"Meu cansaço.",w:"I"}]},
+  {t:"O que mais deseja?",o:[{l:"A",t:"Sentir confiança real em mim mesma.",w:"R"},{l:"B",t:"Sentir que pertenço a algo.",w:"A"},{l:"C",t:"Sentir que mereço receber.",w:"H"},{l:"D",t:"Sentir segurança verdadeira.",w:"T"},{l:"E",t:"Sentir paz com o que sou.",w:"I"}]},
+  {t:"Quando descansa:",o:[{l:"A",t:"Sinto que estou ficando para trás.",w:"R"},{l:"B",t:"Sinto solidão.",w:"A"},{l:"C",t:"Sinto culpa.",w:"H"},{l:"D",t:"Fico inquieta e controlando tudo.",w:"T"},{l:"E",t:"Sinto que sou improdutiva.",w:"I"}]},
+  {t:"Qual frase parece mais sua?",o:[{l:"A",t:"Ainda falta algo.",w:"R"},{l:"B",t:"Preciso de apoio.",w:"A"},{l:"C",t:"Não quero incomodar.",w:"H"},{l:"D",t:"Deixa que eu faço.",w:"T"},{l:"E",t:"Posso melhorar.",w:"I"}]},
+];
+
+const W = {
+  R:{name:"Rejeição",arch:"A Sábia Invisível",evo:"A Maga",evoDesc:"A mulher que para de esperar autorização para existir.",belief:'"Preciso ser perfeita para ser escolhida."',narr:["Você passou a vida tentando merecer seu lugar.","Aprendeu que precisava ser boa. Preparada. Competente. Impecável.","Então transformou conhecimento em proteção.","O problema é que a proteção virou prisão.","Hoje você acredita que precisa estar pronta para aparecer. Mas não é conhecimento que está faltando.","É permissão.","Você não procrastina. Você se prepara infinitamente. Porque existe uma parte sua acreditando que ser vista é perigoso."],p:{Postura:95,Produto:70,Posicionamento:100,Vendas:95}},
+  A:{name:"Abandono",arch:"A Órfã da Aprovação",evo:"A Imperatriz",evoDesc:"A mulher que encontra segurança dentro de si e lidera a partir daí.",belief:'"Preciso ser necessária para ser amada."',narr:["Você vive buscando no mundo a segurança que nunca encontrou dentro.","Seu negócio cresce. Mas sua confiança depende da resposta dos outros.","Cada comentário que não vem é uma ausência.","Cada cliente que sai é um abandono.","Você constrói para ser necessária. Não percebe que isso cria um teto invisível.","Porque quando você depende da aprovação para agir, cada movimento custa o dobro."],p:{Postura:90,Produto:75,Posicionamento:90,Vendas:85}},
+  H:{name:"Humilhação",arch:"A Curadora Mártir",evo:"A Alquimista",evoDesc:"A mulher que transforma o que recebeu sem precisar esconder o que sentiu.",belief:'"Receber é egoísmo."',narr:["Você aprendeu a cuidar de todos.","Mas não aprendeu a receber.","Cobrar ativa culpa. Aparecer ativa vergonha. Destacar conquistas parece arrogância.","Então você entrega demais, cobra de menos, e se pergunta por que está esgotada.","Sua generosidade é real. Mas existe uma parte dela que é proteção.","Porque se você não exige nada, ninguém pode humilhar você por querer demais."],p:{Postura:80,Produto:85,Posicionamento:75,Vendas:100}},
+  T:{name:"Traição",arch:"A Rainha Aprisionada",evo:"A Soberana",evoDesc:"A mulher que lidera com autoridade sem precisar controlar tudo.",belief:'"Não posso confiar."',narr:["Você parece forte.","Mas sua força nasceu da necessidade de nunca depender.","Aprendeu cedo que contar com alguém era um risco. Então resolveu contar apenas consigo.","Hoje você carrega tudo. Centraliza tudo. Confia em ninguém além de si.","Isso faz você funcionar. E também te aprisiona.","Porque nenhuma rainha governa um reino sozinha."],p:{Postura:95,Produto:85,Posicionamento:70,Vendas:80}},
+  I:{name:"Injustiça",arch:"A Guerreira de Ferro",evo:"A Deusa",evoDesc:"A mulher que descobre que seu valor não é algo a provar.",belief:'"Meu valor depende do meu desempenho."',narr:["Você aprendeu que amor vinha através do desempenho.","Por isso nunca descansa.","Mais resultados. Mais conquistas. Mais perfeição.","Mas cada conquista traz um alívio breve. Logo vem a próxima exigência.","Não é preguiça o que você precisa. É permissão para existir antes de provar.","Antes de entregar. Antes de merecer. Apenas por ser quem você é."],p:{Postura:95,Produto:100,Posicionamento:80,Vendas:75}},
+};
+
+const HY = {
+  "R+A":"Você acredita que precisa ser perfeita e necessária ao mesmo tempo. A rejeição te paralisa. O abandono te faz entregar demais para ser lembrada. Nenhuma entrega parece suficiente porque o que você busca não é resultado — é pertencimento.",
+  "R+H":"Você acredita que precisa ser impecável para merecer. E que merecer, de qualquer forma, soa como egoísmo. Então se esconde por trás do conhecimento e da entrega. Aparecendo pouco. Cobrando menos.",
+  "R+T":"Você acredita que precisa estar pronta — e que, quando estiver, terá que resolver tudo sozinha. A combinação cria uma armadilha de preparação infinita que nenhuma parceria rompe.",
+  "R+I":"Você acredita que precisa ser perfeita para ser aceita. Por isso vive tentando compensar insegurança através de desempenho. Nenhuma conquista parece suficiente. Nenhum resultado traz paz.",
+  "A+H":"Você busca aprovação e ainda sente que não merece receber. Essa combinação cria doação sem fim: você entrega para ser amada, mas sente culpa cada vez que algo volta para você.",
+  "A+T":"Você quer conexão mas aprendeu que não pode confiar. Oscila entre aproximar e recuar. Nem parceria profunda, nem solidão completa — uma zona de meio-pertencimento que cansa.",
+  "A+I":"Você busca aprovação e tenta merecê-la pelo desempenho. Trabalha para ser amada. Cansa-se para ser vista. E quando alguém vai embora, interpreta como falha sua.",
+  "H+T":"Você se coloca por último e carrega tudo sozinha. Cuida de todos mas não pede ajuda. Entrega demais mas não delega. A exaustão é silenciosa e íntima.",
+  "H+I":"Você acredita que receber é egoísmo e que seu valor depende do que produz. A combinação cria uma servidão voluntária: trabalha sem parar, cobra pouco, e ainda sente que não fez o suficiente.",
+  "T+I":"Você controla tudo e exige perfeição de si. A desconfiança não te deixa delegar. O perfeccionismo não te deixa soltar. O resultado é um negócio que funciona — mas que te aprisiona.",
+};
+
+let scores={R:0,A:0,H:0,T:0,I:0}, answers={}, cur=0;
+
+function startQuiz(){
+  show('screen-open',false); show('screen-quiz',true); renderQ();
+}
+
+function show(id,on){
+  document.getElementById(id).classList.toggle('active',on);
+}
+
+function renderQ(){
+  const q=Q[cur], tot=Q.length;
+  document.getElementById('prog-label').textContent=`Pergunta ${cur+1} de ${tot}`;
+  document.getElementById('prog-fill').style.width=`${((cur+1)/tot)*100}%`;
+  document.getElementById('q-num').textContent=String(cur+1).padStart(2,'0');
+  document.getElementById('q-text').textContent=q.t;
+  const el=document.getElementById('opts');
+  el.innerHTML='';
+  q.o.forEach((o,i)=>{
+    const b=document.createElement('button');
+    b.className='opt'+(answers[cur]===i?' selected':'');
+    b.innerHTML=`<span class="opt-letter">${o.l}</span>${o.t}`;
+    b.onclick=()=>pick(i);
+    el.appendChild(b);
+  });
+  document.getElementById('btn-back').disabled=cur===0;
+  document.getElementById('btn-next').disabled=answers[cur]===undefined;
+}
+
+function pick(i){
+  answers[cur]=i;
+  document.querySelectorAll('.opt').forEach((b,j)=>b.classList.toggle('selected',j===i));
+  document.getElementById('btn-next').disabled=false;
+}
+
+function nextQ(){
+  if(answers[cur]===undefined)return;
+  if(cur<Q.length-1){cur++;renderQ();}
+  else calc();
+}
+
+function prevQ(){if(cur>0){cur--;renderQ();}}
+
+function calc(){
+  scores={R:0,A:0,H:0,T:0,I:0};
+  Object.keys(answers).forEach(qi=>{
+    scores[Q[parseInt(qi)].o[answers[qi]].w]+=3;
+  });
+  const s=Object.entries(scores).sort((a,b)=>b[1]-a[1]);
+  const tot=Object.values(scores).reduce((a,b)=>a+b,0);
+  const hybrid=tot>0&&(s[0][1]-s[1][1])/tot<0.10;
+  buildResult(s[0][0],s[1][0],hybrid);
+}
+
+function buildResult(dk,sk,hybrid){
+  show('screen-quiz',false); show('screen-result',true);
+  window.scrollTo(0,0);
+  const w=W[dk], ws=W[sk];
+  const htext=HY[dk+'+'+sk]||HY[sk+'+'+dk]||'';
+  let h='';
+  h+=`<div class="res-eyebrow">Sua ferida dominante</div>`;
+  h+=`<div class="res-wound">${w.name}</div>`;
+  h+=`<div class="res-archetype">${w.arch}</div>`;
+  h+=`<div class="res-divider"></div>`;
+  h+=`<div class="res-narrative">`;
+  if(hybrid&&htext){h+=`<p>${htext}</p>`;}
+  else{w.narr.forEach(p=>{h+=`<p>${p}</p>`;});}
+  h+=`</div>`;
+  h+=`<div class="belief-box"><div class="belief-label">A crença que governa</div><div class="belief-text">${w.belief}</div></div>`;
+  h+=`<div class="pillars-section"><div class="pillars-label">Onde isso impacta seu negócio</div>`;
+  Object.entries(w.p).forEach(([n,pct])=>{
+    h+=`<div class="pillar-row"><div class="pillar-name">${n}</div><div class="pillar-track"><div class="pillar-fill" style="width:0%" data-w="${pct}%"></div></div><div class="pillar-pct">${pct}%</div></div>`;
+  });
+  h+=`</div>`;
+  if(hybrid){h+=`<div class="secondary-box"><div class="secondary-label">Ferida secundária</div><div class="secondary-name">${ws.name}</div><div class="secondary-belief">${ws.belief}</div></div>`;}
+  h+=`<div class="evolution-block"><div class="evolution-label">Seu arquétipo evolutivo</div><div class="evolution-name">${w.evo}</div><div class="evolution-desc">${w.evoDesc}</div></div>`;
+  h+=`<div class="final-block"><p>Seu negócio nunca foi o problema.</p><p>Seu negócio apenas revelou a parte de você que mais precisava ser curada.</p><p class="final-small">Toda dor é sintoma. Todo sintoma tem origem. E tem remédio.<br>Não importa como isso chegou até você. O que importa é que você não precisa mais caminhar assim.</p></div>`;
+  h+=`<button class="restart-btn" onclick="restart()">Refazer o diagnóstico</button>`;
+  document.getElementById('result-content').innerHTML=h;
+  setTimeout(()=>{
+    document.querySelectorAll('.pillar-fill').forEach(el=>{
+      el.style.width=el.dataset.w;
+    });
+  },150);
+}
+
+function restart(){
+  scores={R:0,A:0,H:0,T:0,I:0};answers={};cur=0;
+  document.getElementById('result-content').innerHTML='';
+  show('screen-result',false);show('screen-open',true);
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>
